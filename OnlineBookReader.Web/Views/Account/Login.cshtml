@@ -1,0 +1,7 @@
+﻿@using OnlineBookReader.Api.ViewModel
+@model LoginViewModel
+<form asp-action="Login" method="post">
+    <input asp-for="Email" placeholder="Email" />
+    <input asp-for="Password" placeholder="Password" type="password" />
+    <button type="submit">Login</button>
+</form>

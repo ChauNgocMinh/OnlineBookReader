@@ -1,0 +1,8 @@
+﻿@using OnlineBookReader.Api.ViewModel
+@model RegisterViewModel
+<form asp-action="Register" method="post">
+    <input asp-for="Email" placeholder="Email" />
+    <input asp-for="Password" placeholder="Password" type="password" />
+    <input asp-for="ConfirmPassword" placeholder="Confirm Password" type="password" />
+    <button type="submit">Register</button>
+</form>
