@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
-namespace OnlineBookReader.Api.Models
+namespace OnlineBookReader.Web.Models
 {
     public class ApplicationUser : IdentityUser<Guid>
     {

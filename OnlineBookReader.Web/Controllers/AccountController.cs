@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using OnlineBookReader.Api.Models;
-using OnlineBookReader.Api.ViewModel;
+using OnlineBookReader.Web.Models;
+using OnlineBookReader.Web.ViewModel;
 
-namespace OnlineBookReader.Api.Controllers
+namespace OnlineBookReader.Web.Controllers
 {
     public class AccountController : Controller
     {

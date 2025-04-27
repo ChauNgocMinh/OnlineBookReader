@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace OnlineBookReader.Api.Migrations
+namespace OnlineBookReader.Web.Migrations
 {
     /// <inheritdoc />
     public partial class InitDb : Migration

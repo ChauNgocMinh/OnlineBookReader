@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using OnlineBookReader.Api.Models;
+using OnlineBookReader.Web.Models;
 
 #nullable disable
 
-namespace OnlineBookReader.Api.Migrations
+namespace OnlineBookReader.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250425190901_InitDb")]
@@ -128,7 +128,7 @@ namespace OnlineBookReader.Api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineBookReader.Api.Models.ApplicationRole", b =>
+            modelBuilder.Entity("OnlineBookReader.Web.Models.ApplicationRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -156,7 +156,7 @@ namespace OnlineBookReader.Api.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("OnlineBookReader.Api.Models.ApplicationUser", b =>
+            modelBuilder.Entity("OnlineBookReader.Web.Models.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -228,7 +228,7 @@ namespace OnlineBookReader.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("OnlineBookReader.Api.Models.ApplicationRole", null)
+                    b.HasOne("OnlineBookReader.Web.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -237,7 +237,7 @@ namespace OnlineBookReader.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("OnlineBookReader.Api.Models.ApplicationUser", null)
+                    b.HasOne("OnlineBookReader.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -246,7 +246,7 @@ namespace OnlineBookReader.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("OnlineBookReader.Api.Models.ApplicationUser", null)
+                    b.HasOne("OnlineBookReader.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -255,13 +255,13 @@ namespace OnlineBookReader.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("OnlineBookReader.Api.Models.ApplicationRole", null)
+                    b.HasOne("OnlineBookReader.Web.Models.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("OnlineBookReader.Api.Models.ApplicationUser", null)
+                    b.HasOne("OnlineBookReader.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -270,7 +270,7 @@ namespace OnlineBookReader.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("OnlineBookReader.Api.Models.ApplicationUser", null)
+                    b.HasOne("OnlineBookReader.Web.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

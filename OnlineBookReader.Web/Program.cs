@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using OnlineBookReader.Api.Models;
+using OnlineBookReader.Web.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

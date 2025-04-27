@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace OnlineBookReader.Api.Controllers
+namespace OnlineBookReader.Web.Controllers
 {
     public class HomeController : Controller
     {

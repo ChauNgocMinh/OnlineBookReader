@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OnlineBookReader.Api.ViewModel
+namespace OnlineBookReader.Web.ViewModel
 {
     public class LoginViewModel
     {
