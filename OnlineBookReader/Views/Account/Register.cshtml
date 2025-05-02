@@ -1,0 +1,30 @@
+﻿@using OnlineBookReader.ViewModel
+@model RegisterViewModel
+
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+    <form asp-controller="Account" asp-action="Register" method="post" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 35vw;">
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">Đăng ký</h2>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Email</label>
+            <input asp-for="Email" placeholder="Nhập email" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Mật khẩu</label>
+            <input asp-for="Password" type="password" placeholder="Nhập mật khẩu" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Xác nhận mật khẩu</label>
+            <input asp-for="ConfirmPassword" type="password" placeholder="Nhập lại mật khẩu" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; border: 1px solid #ccc; border-radius: 4px;" />
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 0.7rem; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Đăng ký</button>
+
+        <div style="text-align: center; margin-top: 1rem;">
+            <span>Đã có tài khoản? </span>
+            <a asp-controller="Account" asp-action="Login" style="color: #2196F3;">Đăng nhập</a>
+        </div>
+    </form>
+</div>
