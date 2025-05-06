@@ -24,7 +24,6 @@ namespace OnlineBookReader.Controllers.AdminSite
             int pageSize = 10;
 
             var books = _context.Books
-                .Where(b => !b.IsDeleted)
                 .Where(b => string.IsNullOrEmpty(searchTerm) || EF.Functions.Like(b.Title, "%" + searchTerm + "%"))
                 .Include(b => b.Author)
                 .Include(b => b.Category)

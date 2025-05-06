@@ -1,0 +1,27 @@
+﻿@using OnlineBookReader.Models
+@model List<OnlineBookReader.Models.Book>
+@{
+    ViewData["Title"] = "Home Page";
+}
+<section class="Featured-books mt-5" id="Featured-books">
+    <h1 class="heading"><span>Tất cả sách</span></h1>
+    <div class="swiper featured-slider">
+        <div class="swiper-wrapper row justify-content-between">
+            @foreach (var book in Model)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="box">
+                        <div class="image">
+                            <img src="@book.UrlImage" alt="@book.Title" class="img-fluid">
+                        </div>
+                        <div class="content">
+                            <h3>@book.Title</h3>
+                            <p>@book.ShortDescription</p>
+                            <a href="@Url.Action("Details", "Book", new { id = book.Id })" class="btn">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using OnlineBookReader.Models;
 using System.Security.Claims;
 
@@ -15,7 +16,7 @@ namespace OnlineBookReader.Controllers
 
         public async Task<ViewResult> Index()
         {
-            var books = await _dbContext.Books.Take(4).ToListAsync();
+            var books = await _dbContext.Books.ToListAsync();
 
             List<Book> recommendedBooks = new();
 
@@ -91,6 +92,20 @@ namespace OnlineBookReader.Controllers
             }
 
             ViewData["RecommendedBooks"] = recommendedBooks;
+            return View(books);
+        }
+
+        public async Task<ViewResult> ViewAllBooks(string search, bool isOrderBY)
+        {
+            var query = _dbContext.Books
+                .Where(x => string.IsNullOrEmpty(search) || x.Title.ToLower().Contains(search.ToLower()));
+
+            if (isOrderBY)
+            {
+                query = query.OrderByDescending(x => x.CreatedAt);
+            }
+
+            var books = await query.ToListAsync();
             return View(books);
         }
     }

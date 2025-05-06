@@ -28,8 +28,8 @@
     <header class="header">
         <div class="header-1">
             <a href="/" class="logo"><i class="fas fa-book"></i>Bo<span>ok.online</span></a>
-            <form action="" class="search-form">
-                <input type="search" name="" placeholder="Tìm kiếm ở đây..." id="search-box">
+            <form asp-action="ViewAllBooks" method="get" class="search-form">
+                <input type="search" name="search" placeholder="Tìm kiếm ở đây..." id="search-box">
                 <label for="search-box" class="fas fa-search"></label>
             </form>
             <div class="icons">
@@ -71,8 +71,8 @@
         <div class="header-2">
             <nav class="nav-header-2">
                 <a href="/">Trang chủ</a>
-                <a href="#Featured-books">Nổi bật</a>
-                <a href="#Arrivals-books">Top nổi bật</a>
+                <a href="/Home/ViewAllBooks">Tất cả sách</a>
+                <a href="/Home/ViewAllBooks?isOrderBY=true">Mới nhất</a>
                 <a href="#Reviews-books">Đánh giá</a>
                 <a href="#Blogs-books">Bài biết</a>
             </nav>
