@@ -129,49 +129,130 @@ namespace OnlineBookReader.Controllers.AdminSite
                 return NotFound();
             }
 
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books
+                .Include(b => b.Chapters)
+                .ThenInclude(c => c.ChapterContents) 
+                .Include(b => b.Chapters)
+                .ThenInclude(c => c.ChapterImages)  
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (book == null)
             {
                 return NotFound();
             }
+
+            var viewModel = new BookCreateViewModel
+            {
+                Id = book.Id,
+                Title = book.Title,
+                CategoryId = book.CategoryId,
+                AuthorId = book.AuthorId,
+                ShortDescription = book.ShortDescription,
+                Chapters = book.Chapters.Select(c => new ChapterCreateViewModel
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    OrderNumber = c.OrderNumber,
+                    IsText = c.ChapterContents.Any()  
+                }).ToList(),
+            };
+
             ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", book.AuthorId);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", book.CategoryId);
-            return View(book);
+
+            return View(viewModel); 
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Title,CategoryId,AuthorId,UrlImage,ShortDescription,Content,CreatedAt,CreatedBy,UpdatedAt,UpdatedBy,IsDeleted")] Book book)
+        public async Task<IActionResult> Edit(Guid id, BookCreateViewModel model)
         {
-            if (id != book.Id)
+            var book = await _context.Books
+                   .Include(b => b.Chapters)          
+                   .ThenInclude(c => c.ChapterContents)     
+                   .Include(b => b.Chapters)           
+                   .ThenInclude(c => c.ChapterImages)    
+                   .FirstOrDefaultAsync(b => b.Id == id);
+            if (book == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            book.Title = model.Title;
+            book.CategoryId = model.CategoryId;
+            book.AuthorId = model.AuthorId;
+            book.ShortDescription = model.ShortDescription;
+            book.UpdatedAt = DateTime.Now;
+
+            if (model.CoverImageFile != null && model.CoverImageFile.Length > 0)
             {
-                try
+                var fileName = Path.GetFileName(model.CoverImageFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/image", fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
+                    await model.CoverImageFile.CopyToAsync(stream);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                book.UrlImage = "/image/" + fileName;
             }
-            ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", book.AuthorId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", book.CategoryId);
-            return View(book);
+
+            foreach (var chapterVM in model.Chapters)
+            {
+                var chapter = book.Chapters.FirstOrDefault(c => c.Id == chapterVM.Id) ?? new Chapter
+                {
+                    Id = Guid.NewGuid(),
+                    BookId = book.Id
+                };
+
+                chapter.Title = chapterVM.Title;
+                chapter.OrderNumber = chapterVM.OrderNumber;
+
+                if (chapter.Id == Guid.Empty)
+                {
+                    _context.Chapters.Add(chapter);
+                }
+
+                if (chapterVM.IsText && !string.IsNullOrWhiteSpace(chapterVM.HtmlContent))
+                {
+                    var content = chapter.ChapterContents.FirstOrDefault() ?? new ChapterContent
+                    {
+                        Id = Guid.NewGuid(),
+                        ChapterId = chapter.Id,
+                    };
+                    content.Content = chapterVM.HtmlContent;
+                    if (chapter.ChapterContents.Count == 0)
+                    {
+                        _context.ChapterContents.Add(content);
+                    }
+                }
+
+                if (chapterVM.Images != null)
+                {
+                    int page = 1;
+                    foreach (var file in chapterVM.Images)
+                    {
+                        var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                        var filePath = Path.Combine("wwwroot/image", fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var image = new ChapterImage
+                        {
+                            Id = Guid.NewGuid(),
+                            ChapterId = chapter.Id,
+                            ImageUrl = $"/image/{fileName}",
+                            PageOrder = page++
+                        };
+                        _context.ChapterImages.Add(image);
+                    }
+                }
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)

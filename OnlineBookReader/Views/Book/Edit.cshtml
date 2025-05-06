@@ -1,55 +1,156 @@
-﻿@model OnlineBookReader.Models.Book
-
+﻿@using OnlineBookReader.ViewModel
+@model BookCreateViewModel
 @{
-    ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Edit Book";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h1>Edit</h1>
+<h2 class="mb-4">Edit Book</h2>
 
-<h4>Book</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
+<form asp-action="Edit" enctype="multipart/form-data">
+    <div class="card mb-4">
+        <div class="card-header">Book Information</div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Title</label>
+                <input asp-for="Title" class="form-control" placeholder="Enter book title" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AuthorId" class="control-label"></label>
-                <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.AuthorId"></select>
+            <div class="col-md-6">
+                <label class="form-label">Author</label>
+                <select asp-for="AuthorId" asp-items="ViewBag.AuthorId" class="form-select"></select>
                 <span asp-validation-for="AuthorId" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="UrlImage" class="control-label"></label>
-                <input asp-for="UrlImage" class="form-control" />
+            <div class="col-md-6">
+                <label class="form-label">Category</label>
+                <select asp-for="CategoryId" asp-items="ViewBag.CategoryId" class="form-select"></select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Cover Image</label>
+                <input asp-for="UrlImage" class="form-control" type="file" accept="image/*" />
                 <span asp-validation-for="UrlImage" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="ShortDescription" class="control-label"></label>
-                <input asp-for="ShortDescription" class="form-control" />
+            <div class="col-12">
+                <label class="form-label">Short Description</label>
+                <textarea asp-for="ShortDescription" class="form-control" rows="3" placeholder="Enter short description"></textarea>
                 <span asp-validation-for="ShortDescription" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Chapters</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addChapter()">+ Add Chapter</button>
+        </div>
+        <div class="card-body" id="chaptersContainer">
+            @for (int i = 0; i < Model.Chapters.Count; i++)
+            {
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <div class="row g-3 align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Chapter Title</label>
+                            <input name="Chapters[@i].Title" class="form-control" value="@Model.Chapters[i].Title" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Order Number</label>
+                            <input name="Chapters[@i].OrderNumber" type="number" class="form-control" value="@Model.Chapters[i].OrderNumber" />
+                        </div>
+                         <div class="col-md-3">
+                             <label class="form-label">Content Type</label>
+                             <select class="form-select" onchange="toggleChapterMode(this, @i)" name="Chapters[@i].IsText">
+                                <option value="true" selected="@(Model.Chapters[i].IsText ? "selected" : null)" disabled>Text</option>
+                                <option value="false" selected="@(!Model.Chapters[i].IsText ? "selected" : null)" disabled>Image</option>
+                             </select>
+                         </div>
+                    </div>
+
+                    <div class="col-md-12 mt-2 chapter-text" id="textEditor-@i" style="display:@(Model.Chapters[i].IsText ? "block" : "none");">
+                        <label class="form-label">Text Content</label>
+                        <textarea class="form-control ckeditor" name="Chapters[@i].HtmlContent">@Model.Chapters[i].HtmlContent</textarea>
+                    </div>
+                    <div class="col-md-12 mt-2 chapter-image" id="imageUploader-@i" style="display:@(Model.Chapters[i].IsText ? "none" : "block");">
+                        <label class="form-label">Upload Image</label>
+                        <input name="Chapters[@i].Images" type="file" class="form-control" multiple />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Book</button>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
+    <script>
+        let chapterIndex = @Model.Chapters.Count;
+
+        function addChapter() {
+            const container = document.getElementById("chaptersContainer");
+
+            const chapterHtml = `
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <div class="row g-3 align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Chapter Title</label>
+                            <input name="Chapters[${chapterIndex}].Title" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Order Number</label>
+                            <input name="Chapters[${chapterIndex}].OrderNumber" type="number" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Content Type</label>
+                            <select class="form-select" onchange="toggleChapterMode(this, ${chapterIndex})" name="Chapters[${chapterIndex}].IsText">
+                                <option value="true">Text</option>
+                                <option value="false" selected>Image</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 mt-2 chapter-text" id="textEditor-${chapterIndex}" style="display:none;">
+                        <label class="form-label">Text Content</label>
+                        <textarea class="form-control ckeditor" name="Chapters[${chapterIndex}].HtmlContent"></textarea>
+                    </div>
+                    <div class="col-md-12 mt-2 chapter-image" id="imageUploader-${chapterIndex}">
+                        <label class="form-label">Upload Image</label>
+                        <input name="Chapters[${chapterIndex}].Images" type="file" class="form-control" multiple />
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', chapterHtml);
+            chapterIndex++;
+        }
+
+        function toggleChapterMode(select, index) {
+            const isText = select.value === "true";
+
+            const textEditor = document.getElementById(`textEditor-${index}`);
+            const imageUploader = document.getElementById(`imageUploader-${index}`);
+
+            if (isText) {
+                textEditor.style.display = "block";
+                imageUploader.style.display = "none";
+                const textarea = textEditor.querySelector("textarea");
+                if (!textarea.classList.contains("ckeditor-initialized")) {
+                    CKEDITOR.replace(textarea);
+                    textarea.classList.add("ckeditor-initialized");
+                }
+            } else {
+                textEditor.style.display = "none";
+                imageUploader.style.display = "block";
+            }
+        }
+
+        window.onload = function () {
+            document.querySelectorAll('textarea.ckeditor').forEach((textarea) => {
+                if (!textarea.classList.contains("ckeditor-initialized")) {
+                    CKEDITOR.replace(textarea);
+                    textarea.classList.add("ckeditor-initialized");
+                }
+            });
+        };
+    </script>
 }
