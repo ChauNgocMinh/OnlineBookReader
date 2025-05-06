@@ -5,14 +5,30 @@
     <form asp-controller="Account" asp-action="Login" method="post" style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 35vw;">
         <h2 style="text-align: center; margin-bottom: 1.5rem;">Đăng nhập</h2>
 
+        <!-- Hiển thị thông báo lỗi nếu có -->
+        @if (ViewData.ModelState != null && ViewData.ModelState.Values.Any(m => m.Errors.Count > 0))
+        {
+            <div style="color: red; margin-bottom: 1rem; text-align: center;">
+                @foreach (var error in ViewData.ModelState[""].Errors)
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
         <div style="margin-bottom: 1rem;">
-            <label>Email</label>
+            <label for="Email">Email</label>
             <input asp-for="Email" placeholder="Nhập email" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; border: 1px solid #ccc; border-radius: 4px;" />
         </div>
 
-        <div style="margin-bottom: 1.5rem;">
-            <label>Mật khẩu</label>
-            <input asp-for="Password" type="password" placeholder="Nhập mật khẩu" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; border: 1px solid #ccc; border-radius: 4px;" />
+        <div style="margin-bottom: 1.5rem; position: relative;">
+            <label for="Password">Mật khẩu</label>
+            <input id="passwordInput" asp-for="Password" type="password" placeholder="Nhập mật khẩu"
+                   style="width: 100%; padding: 0.5rem; margin-top: 0.3rem; border: 1px solid #ccc; border-radius: 4px;" />
+            <button type="button" onclick="togglePassword()"
+                    style="position: absolute; right: 10px; top: 37px; background: none; border: none; cursor: pointer; color: #2196F3;">
+                👁️
+            </button>
         </div>
 
         <button type="submit" style="width: 100%; padding: 0.7rem; background-color: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">Đăng nhập</button>
@@ -23,3 +39,15 @@
         </div>
     </form>
 </div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('passwordInput');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+        }
+    }
+</script>
+

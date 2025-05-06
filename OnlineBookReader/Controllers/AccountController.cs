@@ -41,19 +41,30 @@ namespace OnlineBookReader.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login()
+        {
+            return View();
+        }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
-
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Email không tồn tại.");
+                return View(model);
+            }
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, false, false);
             if (result.Succeeded)
+            {
                 return RedirectToAction("Index", "Home");
-
-            ModelState.AddModelError("", "Đăng nhập không thành công");
+            }
+            ModelState.AddModelError("", "Đăng nhập không thành công.");
             return View(model);
         }
 

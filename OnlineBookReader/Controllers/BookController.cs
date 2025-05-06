@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using OnlineBookReader.Models;
 
 namespace OnlineBookReader.Controllers
@@ -14,10 +16,12 @@ namespace OnlineBookReader.Controllers
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
-        public BookController(ApplicationDbContext context)
+        public BookController(ApplicationDbContext context, IServiceProvider serviceProvider)
         {
             _context = context;
+            _serviceProvider = serviceProvider;
         }
 
         [Authorize(Roles = "Admin")]
@@ -91,7 +95,6 @@ namespace OnlineBookReader.Controllers
             return View(book);
         }
 
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ReadChapter(Guid chapterId)
         {
             var chapter = await _context.Chapters
@@ -105,6 +108,22 @@ namespace OnlineBookReader.Controllers
                 return NotFound();
             }
 
+            _ = Task.Run(async () =>
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId != null)
+                {
+                    using var scope = _serviceProvider.CreateScope(); 
+                    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    var user = await db.Users.FindAsync(Guid.Parse(userId));
+                    if (user != null)
+                    {
+                        user.LastReadId = chapter.Book.Id;
+                        db.Users.Update(user);
+                        await db.SaveChangesAsync();
+                    }
+                }
+            });
             return View(chapter);
         }
 

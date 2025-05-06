@@ -4,6 +4,7 @@ using OnlineBookReader.Helper;
 using OnlineBookReader.Models;
 using AutoMapper;
 using OnlineBookReader.Models.Seeding;
+using Microsoft.Extensions.Hosting;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
@@ -25,12 +26,13 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var app = builder.Build();
-
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    dbContext.Database.Migrate();
-    SeedData.Initialize(dbContext);
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+    await SeedData.Initialize(dbContext, userManager, roleManager);
 }
 
 if (!app.Environment.IsDevelopment())

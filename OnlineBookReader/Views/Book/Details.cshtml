@@ -45,7 +45,7 @@
                         {
                             <li class="list-group-item">
                                 <strong>Chương @chapter.OrderNumber:</strong> @chapter.Title
-                                <a href="@Url.Action("ReadChapter", "Books", new { chapterId = chapter.Id })">
+                                <a href="@Url.Action("ReadChapter", "Book", new { chapterId = chapter.Id })">
                                     <strong>Chương @chapter.OrderNumber:</strong> @chapter.Title
                                 </a>
                             </li>
@@ -53,13 +53,6 @@
                     </ul>
                 </div>
             }
-
-            <div class="mt-4">
-                <a href="@Url.Action("ReadBook", "Book", new { id = Model.Id })" class="btn btn-primary btn-lg">Đọc ngay</a>
-            </div>
-            <div class="mt-3">
-                <a asp-action="Index" class="btn btn-secondary">Trở lại danh sách</a>
-            </div>
         </div>
     </div>
 

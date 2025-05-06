@@ -1,15 +1,16 @@
-﻿@model List<OnlineBookReader.Models.Book>
+﻿@using OnlineBookReader.Models
+@model List<OnlineBookReader.Models.Book>
 @{
     ViewData["Title"] = "Home Page";
 }
 <section class="Home-books" id="Home-books">
     <div class="row">
         <div class="content">
-            <h3>Up to 75% off</h3>
+            <h3>Khám phá kho sách đồ sộ</h3>
             <p>
-                Welcome to your friendly neighborhood library. We have more than 50,000 ebooks waitting to be discovered.
+                Chào mừng bạn đến với thư viện sách điện tử của chúng tôi. Hơn 50.000 đầu sách đa dạng đang chờ bạn đọc và trải nghiệm.
             </p>
-            <a href="#" class="btn">shop now</a>
+            <a href="#" class="btn">Xem ngay</a>
         </div>
         <div class="swiper books-slider">
             <div class="swiper-wrapper">
@@ -27,36 +28,59 @@
 
 <section class="icon-container">
     <div class="icons">
-        <i class="fas fa-paper-plane"></i>
+        <i class="fas fa-book-open"></i>
         <div class="content">
-            <h3>Free shipping</h3>
-            <p>order over $100</p>
+            <h3>Kho sách phong phú</h3>
+            <p>Đủ thể loại từ văn học đến khoa học</p>
         </div>
     </div>
     <div class="icons">
-        <i class="fas fa-lock"></i>
+        <i class="fas fa-user-friends"></i>
         <div class="content">
-            <h3>Secure payment</h3>
-            <p>100 secure payment</p>
+            <h3>Thân thiện với người dùng</h3>
+            <p>Giao diện đơn giản, dễ sử dụng</p>
         </div>
     </div>
     <div class="icons">
-        <i class="fas fa-redo-alt"></i>
+        <i class="fas fa-mobile-alt"></i>
         <div class="content">
-            <h3>easy returns</h3>
-            <p>10 days returns</p>
+            <h3>Hỗ trợ mọi thiết bị</h3>
+            <p>Đọc sách mọi lúc, mọi nơi</p>
         </div>
     </div>
     <div class="icons">
         <i class="fas fa-headset"></i>
         <div class="content">
-            <h3>24/7 support</h3>
-            <p>call us anytime</p>
-        </div>
+            <h3>Hỗ trợ nhanh chóng</h3>
+            <p>Giải đáp mọi thắc mắc của bạn</p>
+        </div>  
     </div>
 </section>
-<!--icons section ends-->
-<!--featured section starts-->
+
+@if (User.Identity.IsAuthenticated && ViewData["RecommendedBooks"] is List<Book> recommended)
+{
+    <section class="Featured-books" id="Featured-books">
+        <h1 class="heading"><span>Phù hợp với bạn</span></h1>
+        <div class="swiper featured-slider">
+            <div class="swiper-wrapper d-flex justify-content-between">
+                @foreach (var book in recommended)
+                {
+                    <div class="swiper-slide box">
+                        <div class="image">
+                            <img src="@book.UrlImage" alt="@book.Title" />
+                        </div>
+                        <div class="content">
+                            <h3>@book.Title</h3>
+                            <p>@book.ShortDescription</p>
+                            <a href="@Url.Action("Details", "Book", new { id = book.Id })" class="btn">Xem chi tiết</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
 <section class="Featured-books" id="Featured-books">
     <h1 class="heading"><span>Sách nổi bật</span></h1>
     <div class="swiper featured-slider">
@@ -75,31 +99,6 @@
                 </div>
             }
         </div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-    </div>
-</section>
-
-<section class="Featured-books" id="Featured-books">
-    <h1 class="heading"><span>Phù hợp với bạn</span></h1>
-    <div class="swiper featured-slider">
-        <div class="swiper-wrapper d-flex justify-content-between">
-            @foreach (var book in Model)
-            {
-                <div class="swiper-slide box">
-                    <div class="image">
-                        <img src="@book.UrlImage" alt="@book.Title">
-                    </div>
-                    <div class="content">
-                        <h3>@book.Title</h3>
-                        <p>@book.ShortDescription</p>
-                        <a href="@Url.Action("Details", "Book", new { id = book.Id })" class="btn">Xem chi tiết</a>
-                    </div>
-                </div>
-            }
-        </div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
     </div>
 </section>
 

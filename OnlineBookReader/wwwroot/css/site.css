@@ -7,7 +7,6 @@
     outline: none;
     border: none;
     text-decoration: none;
-    text-transform: capitalize;
     transition: all .2s linear;
     transition: width none;
 }
@@ -102,37 +101,35 @@ html {
         border-radius: .5rem;
     }
 
-        .header .header-1 .search-form input {
-            font-size: 1rem;
-            padding: 0 1.2rem;
-            height: 100%;
-            width: 100%;
-            text-transform: none;
-            color: var(--black);
-        }
+.header .header-1 .search-form input {
+    font-size: 1rem;
+    padding: 0 1.2rem;
+    height: 100%;
+    width: 100%;
+    text-transform: none;
+    color: var(--black);
+}
 
-        .header .header-1 .search-form label {
-            font-size: 1.5rem;
-            padding-right: 1rem;
-            color: var(--black);
-        }
+.header .header-1 .search-form label {
+    font-size: 1.5rem;
+    padding-right: 1rem;
+    color: var(--black);
+}
 
-            .header .header-1 .search-form label:hover {
-                color: var(--gray);
-            }
+.header .header-1 .search-form label:hover {
+    color: var(--gray);
+}
 
-    .header .header-1 .icons div,
-    .header .header-1 .icons a {
-        font-size: 1.7rem;
-        margin-left: 1rem;
-        color: var(--dark-color);
-        cursor: pointer;
-    }
+.header .header-1 .icons div,
+.header .header-1 .icons a {
+    color: var(--dark-color);
+    cursor: pointer;
+}
 
-        .header .header-1 .icons div:hover,
-        .header .header-1 .icons a:hover {
-            color: var(--black);
-        }
+.header .header-1 .icons div:hover,
+.header .header-1 .icons a:hover {
+    color: var(--black);
+}
 
 #search-btn {
     display: none;
