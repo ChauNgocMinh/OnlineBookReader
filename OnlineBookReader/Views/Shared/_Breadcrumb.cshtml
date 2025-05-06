@@ -1,0 +1,55 @@
+﻿@using OnlineBookReader.ViewModel
+@model List<BreadcrumbItem>
+
+<style>
+    .breadcrumb {
+        background-color: #f8f9fa;
+        padding: 15px 30px; 
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-size: 18px;
+    }
+
+    .breadcrumb-item {
+        display: inline-block;
+        font-size: 18px; 
+    }
+
+    .breadcrumb-item a {
+        color: #6c757d;
+        font-weight: bold;
+    }
+
+    .breadcrumb-item.active {
+        pointer-events: none; 
+    }
+
+    .breadcrumb-item:not(.active):hover {
+        background-color: #e9ecef; 
+    }
+
+    .breadcrumb li + li::before {
+        content: '>';
+        color: #6c757d;
+    }
+</style>
+
+<nav aria-label="breadcrumb" class="breadcrumb">
+    <div class="container">
+        <ol class="p-0 m-0">
+            @foreach (var item in Model)
+            {
+                if (item.IsActive)
+                {
+                    <li class="breadcrumb-item active p-0" aria-current="page">@item.Title</li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item">
+                        <a href="@item.Url">@item.Title</a>
+                    </li>
+                }
+            }
+        </ol>
+    </div>
+</nav>

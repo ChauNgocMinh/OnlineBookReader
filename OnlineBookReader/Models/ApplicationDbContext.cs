@@ -40,6 +40,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<ApplicationUser>(entity =>
+        {
+            entity.HasOne(u => u.LastRead)
+                  .WithMany() 
+                  .HasForeignKey(u => u.LastReadId)
+                  .IsRequired(false) 
+                  .OnDelete(DeleteBehavior.SetNull); 
+        });
+
         modelBuilder.Entity<Book>().HasQueryFilter(b => !b.IsDeleted);
         modelBuilder.Entity<Author>().HasQueryFilter(a => !a.IsDeleted);
         modelBuilder.Entity<Category>().HasQueryFilter(c => !c.IsDeleted);
@@ -61,7 +70,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
                 .WithMany(a => a.Books)
                 .HasForeignKey(b => b.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
-        });
+            });
 
         modelBuilder.Entity<Chapter>(entity =>
         {

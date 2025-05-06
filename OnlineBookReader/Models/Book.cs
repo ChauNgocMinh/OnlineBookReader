@@ -16,5 +16,5 @@
         public string? ShortDescription { get; set; } 
         public string? Content { get; set; } 
         public virtual List<Chapter> Chapters { get; set; } 
-    }
+    }   
 }

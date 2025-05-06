@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using OnlineBookReader.Models;
 
 namespace OnlineBookReader.Controllers
 {
+    [Authorize]
     public class BookController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,12 +20,14 @@ namespace OnlineBookReader.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Books.Include(b => b.Author).Include(b => b.Category);
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -34,6 +38,7 @@ namespace OnlineBookReader.Controllers
             var book = await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Category)
+                .Include(b => b.Chapters.OrderBy(c => c.OrderNumber)) 
                 .FirstOrDefaultAsync(m => m.Id.Equals(id));
 
             if (book == null)
@@ -42,21 +47,29 @@ namespace OnlineBookReader.Controllers
             }
 
             var recommendedBooks = await _context.Books
-                .Where(b => b.CategoryId.Equals(book.CategoryId) && b.AuthorId.Equals(book.AuthorId) && !b.Id.Equals(book.Id))
+                .Where(b => b.CategoryId.Equals(book.CategoryId) &&
+                            b.AuthorId.Equals(book.AuthorId) &&
+                            !b.Id.Equals(book.Id))
+                .OrderBy(b => Guid.NewGuid())
                 .Include(b => b.Author)
                 .Include(b => b.Category)
                 .Take(4)
                 .ToListAsync();
 
             var existingIds = recommendedBooks.Select(b => b.Id).ToHashSet();
+
             if (recommendedBooks.Count < 4)
             {
                 var remainingBooks = await _context.Books
-                    .Where(b => b.CategoryId.Equals(book.CategoryId) && !b.Id.Equals(book.Id) && !existingIds.Contains(b.Id))
+                    .Where(b => b.CategoryId.Equals(book.CategoryId) &&
+                                !b.Id.Equals(book.Id) &&
+                                !existingIds.Contains(b.Id))
+                    .OrderBy(b => Guid.NewGuid())
                     .Include(b => b.Author)
                     .Include(b => b.Category)
                     .Take(4 - recommendedBooks.Count)
                     .ToListAsync();
+
                 recommendedBooks.AddRange(remainingBooks);
                 existingIds.UnionWith(remainingBooks.Select(b => b.Id));
             }
@@ -64,7 +77,9 @@ namespace OnlineBookReader.Controllers
             if (recommendedBooks.Count < 4)
             {
                 var otherBooks = await _context.Books
-                    .Where(b => !b.Id.Equals(book.Id) && !existingIds.Contains(b.Id))
+                    .Where(b => !b.Id.Equals(book.Id) &&
+                                !existingIds.Contains(b.Id))
+                    .OrderBy(b => Guid.NewGuid())
                     .Include(b => b.Author)
                     .Include(b => b.Category)
                     .Take(4 - recommendedBooks.Count)
@@ -72,11 +87,25 @@ namespace OnlineBookReader.Controllers
 
                 recommendedBooks.AddRange(otherBooks);
             }
-
             ViewData["RecommendedBooks"] = recommendedBooks;
-
-
             return View(book);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ReadChapter(Guid chapterId)
+        {
+            var chapter = await _context.Chapters
+                .Include(c => c.Book)
+                .Include(c => c.ChapterContents)
+                .Include(c => c.ChapterImages.OrderBy(img => img.PageOrder))
+                .FirstOrDefaultAsync(c => c.Id.Equals(chapterId));
+
+            if (chapter == null)
+            {
+                return NotFound();
+            }
+
+            return View(chapter);
         }
 
         public IActionResult Create()

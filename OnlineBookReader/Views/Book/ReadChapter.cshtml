@@ -1,0 +1,39 @@
+﻿@using OnlineBookReader.ViewModel
+@model OnlineBookReader.Models.Chapter
+
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var breadcrumbs = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem { Title = "Home", Url = Url.Action("Index", "Home"), IsActive = false },
+        new BreadcrumbItem { Title = Model.Book.Title, Url = null, IsActive = true },
+        new BreadcrumbItem { Title = Model.Title, Url = null, IsActive = true }
+    };
+}
+@Html.Partial("_Breadcrumb", breadcrumbs)
+<div class="container mt-4">
+    <h2>@Model.Book.Title</h2>
+    <h4>Chương @Model.OrderNumber: @Model.Title</h4>
+    @if (Model.ChapterContents != null && Model.ChapterContents.Any())
+    {
+        <div class="mb-4">
+            @foreach (var content in Model.ChapterContents)
+            {
+                <p>@Html.Raw(content.Content)</p>
+            }
+        </div>
+    }
+
+    @if (Model.ChapterImages != null && Model.ChapterImages.Any())
+    {
+        <div class="row">
+            @foreach (var image in Model.ChapterImages.OrderBy(i => i.PageOrder))
+            {
+                <div class="col-12 text-center mb-3">
+                    <img src="@image.ImageUrl" alt="Page @image.PageOrder" class="img-fluid" />
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -26,7 +26,7 @@ window.onload = () => {
     } else {
         document.querySelector('.header .header-2').classList.remove('active')
     }
-    fadeOut();
+    loader();
 }
 
 function loader() {
@@ -34,7 +34,7 @@ function loader() {
 }
 
 function fadeOut() {
-    setTimeout(loader, 4000);
+    setTimeout(loader, 1000);
 }
 const swiper = new Swiper(".books-slider", {
     loop: true,
