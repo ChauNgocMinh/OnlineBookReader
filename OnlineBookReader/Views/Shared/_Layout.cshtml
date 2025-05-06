@@ -48,7 +48,7 @@
                         <ul class="dropdown-menu" aria-labelledby="userDropdown">
                             @if (roles.Contains("Admin"))
                             {
-                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Trang quản lý</a></li>
+                                <li><a class="dropdown-item"  href="/admin">Trang quản lý</a></li>
                             }
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Thông tin cá nhân</a></li>
                             <li><a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">Đổi mật khẩu</a></li>
