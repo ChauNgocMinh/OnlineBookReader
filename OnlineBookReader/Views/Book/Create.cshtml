@@ -1,0 +1,100 @@
+﻿@using OnlineBookReader.ViewModel
+@model BookCreateViewModel
+@{
+    ViewData["Title"] = "Tạo sách mới";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<h2 class="mb-4">Tạo Sách Mới</h2>
+
+<form asp-action="Create" enctype="multipart/form-data">
+    <div class="card mb-4">
+        <div class="card-header">Thông tin sách</div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Tên sách</label>
+                <input asp-for="Title" class="form-control" placeholder="Nhập tên sách" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Tác giả</label>
+                <select asp-for="AuthorId" asp-items="ViewBag.AuthorId" class="form-select"></select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Thể loại</label>
+                <select asp-for="CategoryId" asp-items="ViewBag.CategoryId" class="form-select"></select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ảnh bìa</label>
+                <input asp-for="CoverImageFile" class="form-control" type="file" accept="image/*" />
+            </div>
+            <div class="col-12">
+                <label class="form-label">Mô tả ngắn</label>
+                <textarea asp-for="ShortDescription" class="form-control" rows="3" placeholder="Nhập mô tả"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách Chapter -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Danh sách chương</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addChapter()">
+                + Thêm chương
+            </button>
+        </div>
+        <div class="card-body" id="chaptersContainer">
+            <!-- Chapter items will be added here -->
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Lưu sách</button>
+</form>
+
+@section Scripts {
+    <script>
+        let chapterIndex = 0;
+
+        function addChapter() {
+            const container = document.getElementById("chaptersContainer");
+
+            const chapterHtml = `
+                <div class="border rounded p-3 mb-4 bg-light">
+                    <div class="row g-3 align-items-center mb-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên chương</label>
+                            <input name="Chapters[${chapterIndex}].Title" class="form-control" placeholder="Tên chương" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Thứ tự</label>
+                            <input name="Chapters[${chapterIndex}].OrderNumber" type="number" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Loại nội dung</label>
+                            <select class="form-select" onchange="toggleChapterMode(this, ${chapterIndex})" name="Chapters[${chapterIndex}].IsText">
+                                <option value="true">Văn bản</option>
+                                <option value="false" selected>Hình ảnh</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="textArea_${chapterIndex}" style="display:none;">
+                        <label class="form-label">Nội dung HTML</label>
+                        <textarea name="Chapters[${chapterIndex}].HtmlContent" class="form-control" rows="5" placeholder="Nhập nội dung HTML"></textarea>
+                    </div>
+
+                    <div id="imageUpload_${chapterIndex}">
+                        <label class="form-label">Tải ảnh lên</label>
+                        <input name="Chapters[${chapterIndex}].Images" type="file" class="form-control" multiple />
+                    </div>
+                </div>
+                `;
+            container.insertAdjacentHTML('beforeend', chapterHtml);
+            chapterIndex++;
+        }
+
+        function toggleChapterMode(select, index) {
+            const isText = select.value === "true";
+            document.getElementById(`textArea_${index}`).style.display = isText ? "block" : "none";
+            document.getElementById(`imageUpload_${index}`).style.display = isText ? "none" : "block";
+        }
+    </script>
+}

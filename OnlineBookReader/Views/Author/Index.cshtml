@@ -1,0 +1,69 @@
+﻿@model IEnumerable<OnlineBookReader.Models.Author>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+<style>
+    .description-cell {
+        max-width: 250px;
+        line-height: 1.4em;
+    }
+
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .card-header {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .card-header .btn {
+        color: #007bff;
+    }
+
+    .card-header .btn:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">📚 Danh sách thể loại</h5>
+        <a href="@Url.Action("Create", "Author")" class="btn btn-light btn-sm">➕ Thêm thể loại mới</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped mb-0">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Tên</th>
+                        <th>Giới thiệu</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Bio</td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Edit", "Author", new { id = item.Id })" class="btn btn-sm btn-warning">Sửa</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">🗑 Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@if (TempData["DeleteError"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["DeleteError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

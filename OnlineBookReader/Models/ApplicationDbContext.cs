@@ -25,17 +25,23 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = DateTime.Now;
-                entry.Entity.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name; 
-                entry.Entity.IsDeleted = false;
+                entry.Entity.CreatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+                entry.Entity.IsDeleted = false; 
             }
             else if (entry.State == EntityState.Modified)
             {
                 entry.Entity.UpdatedAt = DateTime.Now;
-                entry.Entity.UpdatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name; 
+                entry.Entity.UpdatedBy = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+            }
+            else if (entry.State == EntityState.Deleted)
+            {
+                entry.Entity.IsDeleted = true;
+                entry.State = EntityState.Modified; 
             }
         }
         return base.SaveChanges();
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

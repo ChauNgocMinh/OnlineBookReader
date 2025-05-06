@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineBookReader.Models;
+using OnlineBookReader.ViewModel;
 
-namespace OnlineBookReader.Areas.Admin.Controllers
+namespace OnlineBookReader.Controllers.AdminSite
 {
-    [Authorize]
-    [Area("Admin")]
     [Authorize(Roles = "Admin")]
     public class BookController : Controller
     {
@@ -50,19 +49,79 @@ namespace OnlineBookReader.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,CategoryId,AuthorId,UrlImage,ShortDescription,Content,CreatedAt,CreatedBy,UpdatedAt,UpdatedBy,IsDeleted")] Book book)
+        public async Task<IActionResult> Create(BookCreateViewModel model)
         {
-            if (ModelState.IsValid)
+            var book = new Book
             {
-                book.Id = Guid.NewGuid();
-                _context.Add(book);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                Id = Guid.NewGuid(),
+                Title = model.Title,
+                CategoryId = model.CategoryId,
+                AuthorId = model.AuthorId,
+                ShortDescription = model.ShortDescription,
+                CreatedAt = DateTime.Now
+            };
+            if (model.CoverImageFile != null && model.CoverImageFile.Length > 0)
+            {
+                var fileName = Path.GetFileName(model.CoverImageFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/image", fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.CoverImageFile.CopyToAsync(stream);
+                }
+                book.UrlImage = "/image/" + fileName;
             }
-            ViewData["AuthorId"] = new SelectList(_context.Authors, "Id", "Name", book.AuthorId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", book.CategoryId);
-            return View(book);
+            _context.Books.Add(book);
+
+            foreach (var chapterVM in model.Chapters)
+            {
+                var chapter = new Chapter
+                {
+                    Id = Guid.NewGuid(),
+                    BookId = book.Id,
+                    Title = chapterVM.Title,
+                    OrderNumber = chapterVM.OrderNumber
+                };
+                _context.Chapters.Add(chapter);
+
+                if (chapterVM.IsText && !string.IsNullOrWhiteSpace(chapterVM.HtmlContent))
+                {
+                    var content = new ChapterContent
+                    {
+                        Id = Guid.NewGuid(),
+                        ChapterId = chapter.Id,
+                        Content = chapterVM.HtmlContent
+                    };
+                    _context.ChapterContents.Add(content);
+                }
+                else if (chapterVM.Images != null)
+                {
+                    int page = 1;
+                    foreach (var file in chapterVM.Images)
+                    {
+                        var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+                        var filePath = Path.Combine("wwwroot/image", fileName);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var image = new ChapterImage
+                        {
+                            Id = Guid.NewGuid(),
+                            ChapterId = chapter.Id,
+                            ImageUrl = $"/image/{fileName}",
+                            PageOrder = page++
+                        };
+                        _context.ChapterImages.Add(image);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -114,28 +173,8 @@ namespace OnlineBookReader.Areas.Admin.Controllers
             return View(book);
         }
 
-        public async Task<IActionResult> Delete(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var book = await _context.Books
-                .Include(b => b.Author)
-                .Include(b => b.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return View(book);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(Guid id)
         {
             var book = await _context.Books.FindAsync(id);
             if (book != null)
