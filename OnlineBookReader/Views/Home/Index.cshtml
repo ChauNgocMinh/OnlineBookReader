@@ -88,7 +88,7 @@
     <h1 class="heading"><span>Sách nổi bật</span></h1>
     <div class="swiper featured-slider">
         <div class="swiper-wrapper d-flex justify-content-between">
-            @foreach (var book in Model.Take(4))
+            @foreach (var book in Model.Take(4).OrderByDescending(x => x.NumberRead))
             {
                 <div class="swiper-slide box">  
                     <div class="image">
