@@ -10,7 +10,7 @@
 
         public Guid AuthorId { get; set; }
         public Author Author { get; set; } = null!;
-
+        public int NumberRead { get; set; } = 0;
         public bool Type { get; set; }
         public string? UrlImage { get; set; }
         public string? ShortDescription { get; set; } 

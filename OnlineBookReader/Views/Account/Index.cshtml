@@ -1,0 +1,54 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using OnlineBookReader.Models
+@model IEnumerable<OnlineBookReader.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Quản Lý Tài Khoản";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="mb-3">
+    <a href="@Url.Action("Create")" class="btn btn-primary">Tạo Mới Tài Khoản</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Họ tên</th>
+            <th>Email</th>
+            <th>Chức vụ</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FullName</td>
+                <td>@user.Email</td>
+                <td>
+                    <form method="post" action="@Url.Action("UpdateRole", "Account")">
+                        <input type="hidden" name="userId" value="@user.Id" />
+                        <select name="roleName" class="form-control" onchange="this.form.submit()">
+                            @foreach (var role in ViewBag.Roles as List<ApplicationRole>)
+                            {
+                                <option value="@role.Name"
+                                        selected="@(ViewBag.UserRoles[user.Id] != null && ViewBag.UserRoles[user.Id].Contains(role.Name) ? "selected" : null)">
+                                    @role.Name
+                                </option>
+                            }
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    <a href="@Url.Action("ToggleLock", new { id = user.Id })"
+                       class="btn @(user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow ? "btn-success" : "btn-warning")">
+                        @(user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow ? "Mở khóa" : "Chặn tài khoản")
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

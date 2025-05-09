@@ -29,6 +29,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = services.GetRequiredService<ApplicationDbContext>();
     var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+    dbContext.Database.Migrate();
     await SeedData.Initialize(dbContext, userManager, roleManager);
 }
 app.MapGet("/admin", context =>

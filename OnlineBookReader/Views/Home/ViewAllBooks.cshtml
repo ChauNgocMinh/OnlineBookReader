@@ -4,7 +4,7 @@
     ViewData["Title"] = "Home Page";
 }
 <section class="Featured-books mt-5" id="Featured-books">
-    <h1 class="heading"><span>Tất cả sách</span></h1>
+    <h1 class="heading"><span>Danh sách sản phẩm</span></h1>
     <div class="swiper featured-slider">
         <div class="swiper-wrapper row justify-content-between">
             @foreach (var book in Model)
@@ -15,8 +15,9 @@
                             <img src="@book.UrlImage" alt="@book.Title" class="img-fluid">
                         </div>
                         <div class="content">
-                            <h3>@book.Title</h3>
+                            <a style="text-decoration: none; color: black;" href="@Url.Action("Details", "Book", new { id = book.Id })">@book.Title</a>
                             <p>@book.ShortDescription</p>
+                            <p><strong>Lượt xem:</strong> @book.NumberRead</p>
                             <a href="@Url.Action("Details", "Book", new { id = book.Id })" class="btn">Xem chi tiết</a>
                         </div>
                     </div>

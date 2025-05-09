@@ -108,6 +108,12 @@ namespace OnlineBookReader.Controllers
                     {
                         user.LastReadId = chapter.Book.Id;
                         db.Users.Update(user);
+                        var book = await db.Books.FindAsync(chapter.Book.Id);
+                        if (book != null)
+                        {
+                            book.NumberRead++;
+                            db.Books.Update(book);
+                        }
                         await db.SaveChangesAsync();
                     }
                 }
