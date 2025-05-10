@@ -7,9 +7,17 @@
 
 <style>
     .description-cell {
-        max-width: 250px;
-        line-height: 1.4em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 300px;
+        line-height: 1.5em;
+        height: 3.4em;
+        white-space: normal; 
     }
+
 
     .table th, .table td {
         vertical-align: middle;
@@ -60,7 +68,7 @@
         </form>
 
         <div class="table-responsive">
-            <table class="table table-striped table-bordered mb-0">
+            <table class="table table-bordered mb-0">
                 <thead class="table-light">
                     <tr class="text-center">
                         <th>Ảnh</th>
@@ -82,7 +90,7 @@
                             <td>@item.Category?.Name</td>
                             <td>@item.Author?.Name</td>
                             <td class="description-cell">@item.ShortDescription</td>
-                            <td class="text-center">
+                            <td style="min-width: 120px;" class="text-center">
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
                                 <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa không?');">Xóa</a>
                             </td>

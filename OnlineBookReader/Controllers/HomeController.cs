@@ -16,7 +16,7 @@ namespace OnlineBookReader.Controllers
 
         public async Task<ViewResult> Index()
         {
-            var books = await _dbContext.Books.ToListAsync();
+            var books = await _dbContext.Books.Include(x =>x.Chapters).ToListAsync();
 
             List<Book> recommendedBooks = new();
 
@@ -97,7 +97,7 @@ namespace OnlineBookReader.Controllers
 
         public async Task<ViewResult> ViewAllBooks(string search, bool isOrderBY)
         {
-            var query = _dbContext.Books
+            var query = _dbContext.Books.Include(x => x.Chapters)
                 .Where(x => string.IsNullOrEmpty(search) || x.Title.ToLower().Contains(search.ToLower()));
 
             if (isOrderBY)

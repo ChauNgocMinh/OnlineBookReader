@@ -28,8 +28,8 @@
             </div>
             <div class="col-md-6">
                 <label class="form-label">Cover Image</label>
-                <input asp-for="UrlImage" class="form-control" type="file" accept="image/*" />
-                <span asp-validation-for="UrlImage" class="text-danger"></span>
+                <input asp-for="CoverImageFile" class="form-control" type="file" accept="image/*" />
+                <span asp-validation-for="CoverImageFile" class="text-danger"></span>
             </div>
             <div class="col-12">
                 <label class="form-label">Short Description</label>
@@ -49,6 +49,7 @@
             {
                 <div class="border rounded p-3 mb-4 bg-light">
                     <div class="row g-3 align-items-center mb-2">
+                        <input type="hidden" name="Chapters[@i].Id" value="@Model.Chapters[i].Id" />
                         <div class="col-md-6">
                             <label class="form-label">Chapter Title</label>
                             <input name="Chapters[@i].Title" class="form-control" value="@Model.Chapters[i].Title" />
@@ -86,14 +87,14 @@
     <script src="https://cdn.ckeditor.com/4.21.0/standard/ckeditor.js"></script>
     <script>
         let chapterIndex = @Model.Chapters.Count;
-
         function addChapter() {
+
             const container = document.getElementById("chaptersContainer");
 
             const chapterHtml = `
                 <div class="border rounded p-3 mb-4 bg-light">
                     <div class="row g-3 align-items-center mb-2">
-                        <div class="col-md-6">
+                            <div class="col-md-6">
                             <label class="form-label">Chapter Title</label>
                             <input name="Chapters[${chapterIndex}].Title" class="form-control" />
                         </div>
@@ -121,8 +122,15 @@
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', chapterHtml);
+
+            const newTextarea = document.querySelector(`textarea[name='Chapters[${chapterIndex}].HtmlContent']`);
+            if (newTextarea) {
+                CKEDITOR.replace(newTextarea);
+            }
+
             chapterIndex++;
         }
+
 
         function toggleChapterMode(select, index) {
             const isText = select.value === "true";

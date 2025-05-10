@@ -3,6 +3,19 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+<style>
+    .description-content {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 300px;
+        line-height: 1.5em;
+        height: 3em;
+        white-space: normal;
+    }
+</style>
 <section class="Featured-books mt-5" id="Featured-books">
     <h1 class="heading"><span>Danh sách sản phẩm</span></h1>
     <div class="swiper featured-slider">
@@ -15,8 +28,9 @@
                             <img src="@book.UrlImage" alt="@book.Title" class="img-fluid">
                         </div>
                         <div class="content">
-                            <a style="text-decoration: none; color: black;" href="@Url.Action("Details", "Book", new { id = book.Id })">@book.Title</a>
-                            <p>@book.ShortDescription</p>
+                            <a style="text-decoration: none; color: black; font-weight: bold; font-size: 20px;" href="@Url.Action("Details", "Book", new { id = book.Id })">@book.Title</a>
+                            <p class="description-content">@book.ShortDescription</p>
+                            <p><strong>Số chương</strong> @book.Chapters.Count()</p>
                             <p><strong>Lượt xem:</strong> @book.NumberRead</p>
                             <a href="@Url.Action("Details", "Book", new { id = book.Id })" class="btn">Xem chi tiết</a>
                         </div>

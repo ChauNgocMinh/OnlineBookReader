@@ -57,7 +57,8 @@ namespace OnlineBookReader.Controllers.AdminSite
                 CategoryId = model.CategoryId,
                 AuthorId = model.AuthorId,
                 ShortDescription = model.ShortDescription,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                Chapters = new List<Chapter>()
             };
             if (model.CoverImageFile != null && model.CoverImageFile.Length > 0)
             {
@@ -79,9 +80,10 @@ namespace OnlineBookReader.Controllers.AdminSite
                     Id = Guid.NewGuid(),
                     BookId = book.Id,
                     Title = chapterVM.Title,
-                    OrderNumber = chapterVM.OrderNumber
+                    ChapterContents = new List<ChapterContent>(),
+                    ChapterImages = new List<ChapterImage>()
                 };
-                _context.Chapters.Add(chapter);
+                book.Chapters.Add(chapter);
 
                 if (chapterVM.IsText && !string.IsNullOrWhiteSpace(chapterVM.HtmlContent))
                 {
@@ -136,7 +138,7 @@ namespace OnlineBookReader.Controllers.AdminSite
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (book == null)
-            {
+            {           
                 return NotFound();
             }
 
@@ -147,11 +149,13 @@ namespace OnlineBookReader.Controllers.AdminSite
                 CategoryId = book.CategoryId,
                 AuthorId = book.AuthorId,
                 ShortDescription = book.ShortDescription,
+                UrlImage = book.UrlImage,
                 Chapters = book.Chapters.Select(c => new ChapterCreateViewModel
                 {
                     Id = c.Id,
                     Title = c.Title,
                     OrderNumber = c.OrderNumber,
+                    HtmlContent = c.ChapterContents.Any() ? c.ChapterContents.FirstOrDefault().Content : "" ,
                     IsText = c.ChapterContents.Any()  
                 }).ToList(),
             };
@@ -197,31 +201,44 @@ namespace OnlineBookReader.Controllers.AdminSite
 
             foreach (var chapterVM in model.Chapters)
             {
-                var chapter = book.Chapters.FirstOrDefault(c => c.Id == chapterVM.Id) ?? new Chapter
-                {
-                    Id = Guid.NewGuid(),
-                    BookId = book.Id
-                };
+                var chapter = book.Chapters.FirstOrDefault(c => c.Id == chapterVM.Id);
 
-                chapter.Title = chapterVM.Title;
-                chapter.OrderNumber = chapterVM.OrderNumber;
-
-                if (chapter.Id == Guid.Empty)
+                if (chapter == null)
                 {
-                    _context.Chapters.Add(chapter);
+                    chapter = new Chapter
+                    {
+                        Id = Guid.NewGuid(),
+                        BookId = book.Id,
+                        Title = chapterVM.Title,
+                        OrderNumber = chapterVM.OrderNumber,
+                        ChapterContents = new List<ChapterContent>(),
+                        ChapterImages = new List<ChapterImage>()
+                    };
+                    _context.Chapters.Add(chapter); 
+                    book.Chapters.Add(chapter);
+                }
+                else
+                {
+                    chapter.Title = chapterVM.Title;
+                    chapter.OrderNumber = chapterVM.OrderNumber;
                 }
 
                 if (chapterVM.IsText && !string.IsNullOrWhiteSpace(chapterVM.HtmlContent))
                 {
-                    var content = chapter.ChapterContents.FirstOrDefault() ?? new ChapterContent
+                    var content = chapter.ChapterContents?.FirstOrDefault();
+                    if (content == null)
                     {
-                        Id = Guid.NewGuid(),
-                        ChapterId = chapter.Id,
-                    };
-                    content.Content = chapterVM.HtmlContent;
-                    if (chapter.ChapterContents.Count == 0)
-                    {
+                        content = new ChapterContent
+                        {
+                            Id = Guid.NewGuid(),
+                            ChapterId = chapter.Id,
+                            Content = chapterVM.HtmlContent
+                        };
                         _context.ChapterContents.Add(content);
+                    }
+                    else
+                    {
+                        content.Content = chapterVM.HtmlContent;
                     }
                 }
 
@@ -252,8 +269,6 @@ namespace OnlineBookReader.Controllers.AdminSite
             return RedirectToAction(nameof(Index));
         }
 
-
-        [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
             var book = await _context.Books.FindAsync(id);
